@@ -30,7 +30,7 @@ rm -f pit.*.out
 # run analysis
 
 
-for i in $(seq 1 1);
+for i in $(seq 1 100);
 do
 	echo "Init run #$i"
 	date
