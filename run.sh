@@ -40,7 +40,7 @@ rm -f pit.*.out
 
 cd commons-lang
 
-for i in $(seq 9 100);
+for i in $(seq 1 100);
 do
 	echo "Normal run #$i"
 	date
