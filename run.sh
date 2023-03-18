@@ -23,13 +23,13 @@ function runAnalysis() {
 	else
 		prioritiseKillingTests=false
 	fi
-	pushd $project
 	git checkout pit/$version >>"$out" 2>&1
-	mvn -e clean install >>"$out" 2>&1
+	mvn -e clean install >>"$out" 2>&1 || { return 0; }
 	date >>"$out"
-	mvn -e pitest:mutationCoverage -Dpit.metaMutationAnalysis=$metaMutationAnalysis -Dpit.metaMutationUnitSize=$metaMutationUnitSize -Dpit.prioritiseKillingTests=$prioritiseKillingTests -Dpit.verbose=false >>"$out" 2>&1
+	set +e
+	mvn -e pitest:mutationCoverage -Dpit.metaMutationAnalysis=$metaMutationAnalysis -Dpit.metaMutationUnitSize=$metaMutationUnitSize -Dpit.prioritiseKillingTests=$prioritiseKillingTests -Dpit.verbose=false >>"$out" 2>&1 || { return 0; }
+	set -e
 	date >>"$out"
-	popd
 }
 
 # remove old output files
@@ -38,13 +38,9 @@ rm -f pit.*.out
 
 # run analysis
 
+cd commons-lang
 
-echo "Init run"
-date
-runAnalysis commons-lang 3.9 0 init
-date
-
-for i in $(seq 1 100);
+for i in $(seq 9 100);
 do
 	echo "Normal run #$i"
 	date
