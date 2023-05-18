@@ -6,5 +6,5 @@ git clone https://github.com/markuskreusch/pitest.git
 git clone https://github.com/markuskreusch/commons-lang.git
 
 cd pitest
-git checkout meta_mutants
+git checkout optimizations
 mvn clean install

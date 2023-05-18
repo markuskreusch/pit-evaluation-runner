@@ -15,6 +15,9 @@ function runAnalysis() {
 	elif [ "$typ" = "metaMutationAnalysisGroup" ]; then
 		metaMutatonAnalysis=true
 		metaMutationUnitSize=999999
+	elif [ "$typ" = "metaMutationAnalysisThreads" ]; then
+		metaMutationAnalysis=true
+		metaMutationUnitSize=0
 	else
 		metaMutationAnalysis=false
 	fi
@@ -44,14 +47,30 @@ rm -f pit.*.out
 
 cd commons-lang
 
+
 for i in $(seq 1 100);
 do
 	echo "Normal run #$i"
 	date
-	runAnalysis commons-lang 3.10 $i normal
-	runAnalysis commons-lang 3.11 $i normal
-	runAnalysis commons-lang 3.12 $i normal
+	rm -f /tmp/pit-history-commons-lang-*.bin
+	runAnalysis commons-lang 3.10 $i non-incremental
+	rm -f /tmp/pit-history-commons-lang-*.bin
+	runAnalysis commons-lang 3.11 $i non-incremental
+	rm -f /tmp/pit-history-commons-lang-*.bin
+	runAnalysis commons-lang 3.12 $i non-incremental
 	date
+done
+
+runAnalysis commons-lang 3.9 0 normal
+
+for i in $(seq 1 100);
+do
+	#echo "Normal run #$i"
+	#date
+	#runAnalysis commons-lang 3.10 $i normal
+	#runAnalysis commons-lang 3.11 $i normal
+	#runAnalysis commons-lang 3.12 $i normal
+	#date
 
 	#echo "Meta Mutation Analysis Single Optimized run #$i"
 	#date
@@ -67,6 +86,13 @@ do
 	#runAnalysis commons-lang 3.12 $i metaMutationAnalysisGroup
 	#date
 
+	#echo "Meta Mutation Analysis Threads Optimized run #$i"
+	#date
+	#runAnalysis commons-lang 3.10 $i metaMutationAnalysisThreads
+	#runAnalysis commons-lang 3.11 $i metaMutationAnalysisThreads
+	#runAnalysis commons-lang 3.12 $i metaMutationAnalysisThreads
+	#date
+
 	#echo "Killing Test Priority Optimized run #$i"
 	#date
 	#runAnalysis commons-lang 3.10 $i prioritiseKillingTests
@@ -75,16 +101,16 @@ do
 	#date
 
 	echo "Killing Test Priority Random Optimized run #$i"
-  date
-  runAnalysis commons-lang 3.10 $i prioritiseKillingTestsRandom
-  runAnalysis commons-lang 3.11 $i prioritiseKillingTestsRandom
-  runAnalysis commons-lang 3.12 $i prioritiseKillingTestsRandom
-  date
+	date
+	runAnalysis commons-lang 3.10 $i prioritiseKillingTestsRandom
+	runAnalysis commons-lang 3.11 $i prioritiseKillingTestsRandom
+	runAnalysis commons-lang 3.12 $i prioritiseKillingTestsRandom
+	date
 
-  echo "Random Test Priority run #$i"
-  date
-  runAnalysis commons-lang 3.10 $i randomTestOrder
-  runAnalysis commons-lang 3.11 $i randomTestOrder
-  runAnalysis commons-lang 3.12 $i randomTestOrder
-  date
+	echo "Random Test Priority run #$i"
+	date
+	runAnalysis commons-lang 3.10 $i randomTestOrder
+	runAnalysis commons-lang 3.11 $i randomTestOrder
+	runAnalysis commons-lang 3.12 $i randomTestOrder
+	date
 done
