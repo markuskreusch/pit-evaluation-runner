@@ -9,17 +9,10 @@ function runAnalysis() {
 	index=$3
 	typ=$4
 	out=$SCRIPT_DIR/pit.$project.$version.$typ.$index.out
-	metaMutationUnitSize=1
-	if [ "$typ" = "metaMutationAnalysisSingle" ]; then
-		metaMutationAnalysis=true
-	elif [ "$typ" = "metaMutationAnalysisGroup" ]; then
-		metaMutatonAnalysis=true
-		metaMutationUnitSize=999999
-	elif [ "$typ" = "metaMutationAnalysisThreads" ]; then
-		metaMutationAnalysis=true
-		metaMutationUnitSize=0
+	if [ "$typ" = "combinedMutantAnalysis" ]; then
+		combinedMutantAnalysis=true
 	else
-		metaMutationAnalysis=false
+		combinedMutantAnalysis=false
 	fi
 	if [ "$typ" = "prioritiseKillingTests" ]; then
 		prioritiseTestsStrategy=DEFAULT_WITH_KILLING_FIRST
@@ -34,7 +27,7 @@ function runAnalysis() {
 	mvn -e clean install >>"$out" 2>&1 || { return 0; }
 	date >>"$out"
 	set +e
-	mvn -e pitest:mutationCoverage -Dpit.metaMutationAnalysis=$metaMutationAnalysis -Dpit.metaMutationUnitSize=$metaMutationUnitSize -Dpit.prioritiseTestsStrategy=$prioritiseTestsStrategy -Dpit.verbose=false >>"$out" 2>&1 || { return 0; }
+	mvn -e pitest:mutationCoverage -Dpit.combinedMutantAnalysis=combinedMutantAnalysis -Dpit.prioritiseTestsStrategy=$prioritiseTestsStrategy -Dpit.verbose=false >>"$out" 2>&1 || { return 0; }
 	set -e
 	date >>"$out"
 }
@@ -48,9 +41,9 @@ rm -f pit.*.out
 cd commons-lang
 
 
-for i in $(seq 1 100);
+for i in $(seq 1 50);
 do
-	echo "Normal run #$i"
+	echo "NonIncremental run #$i"
 	date
 	rm -f /tmp/pit-history-commons-lang-*.bin
 	runAnalysis commons-lang 3.10 $i non-incremental
@@ -58,53 +51,57 @@ do
 	runAnalysis commons-lang 3.11 $i non-incremental
 	rm -f /tmp/pit-history-commons-lang-*.bin
 	runAnalysis commons-lang 3.12 $i non-incremental
+	rm -f /tmp/pit-history-commons-lang-*.bin
+	runAnalysis commons-lang 3.12-1 $i non-incremental
+	rm -f /tmp/pit-history-commons-lang-*.bin
+	runAnalysis commons-lang 3.12-2 $i non-incremental
+	rm -f /tmp/pit-history-commons-lang-*.bin
+	runAnalysis commons-lang 3.12-3 $i non-incremental
 	date
 done
 
 runAnalysis commons-lang 3.9 0 normal
 
-for i in $(seq 1 100);
+for i in $(seq 1 50);
 do
-	#echo "Normal run #$i"
-	#date
-	#runAnalysis commons-lang 3.10 $i normal
-	#runAnalysis commons-lang 3.11 $i normal
-	#runAnalysis commons-lang 3.12 $i normal
-	#date
+	echo "Normal run #$i"
+	date
+	runAnalysis commons-lang 3.10 $i normal
+	runAnalysis commons-lang 3.11 $i normal
+	runAnalysis commons-lang 3.12 $i normal
+	runAnalysis commons-lang 3.12-1 $i normal
+	runAnalysis commons-lang 3.12-2 $i normal
+	runAnalysis commons-lang 3.12-3 $i normal
+	date
 
-	#echo "Meta Mutation Analysis Single Optimized run #$i"
-	#date
-	#runAnalysis commons-lang 3.10 $i metaMutationAnalysisSingle
-	#runAnalysis commons-lang 3.11 $i metaMutationAnalysisSingle
-	#runAnalysis commons-lang 3.12 $i metaMutationAnalysisSingle
-	#date
+	echo "Combined Mutation Analysis Optimized run #$i"
+	date
+	runAnalysis commons-lang 3.10 $i combinedMutantAnalysis
+	runAnalysis commons-lang 3.11 $i combinedMutantAnalysis
+	runAnalysis commons-lang 3.12 $i combinedMutantAnalysis
+	runAnalysis commons-lang 3.12-1 $i combinedMutantAnalysis
+	runAnalysis commons-lang 3.12-2 $i combinedMutantAnalysis
+	runAnalysis commons-lang 3.12-3 $i combinedMutantAnalysis
+	date
 
-	#echo "Meta Mutation Analysis Group Optimized run #$i"
-	#date
-	#runAnalysis commons-lang 3.10 $i metaMutationAnalysisGroup
-	#runAnalysis commons-lang 3.11 $i metaMutationAnalysisGroup
-	#runAnalysis commons-lang 3.12 $i metaMutationAnalysisGroup
-	#date
-
-	#echo "Meta Mutation Analysis Threads Optimized run #$i"
-	#date
-	#runAnalysis commons-lang 3.10 $i metaMutationAnalysisThreads
-	#runAnalysis commons-lang 3.11 $i metaMutationAnalysisThreads
-	#runAnalysis commons-lang 3.12 $i metaMutationAnalysisThreads
-	#date
-
-	#echo "Killing Test Priority Optimized run #$i"
-	#date
-	#runAnalysis commons-lang 3.10 $i prioritiseKillingTests
-	#runAnalysis commons-lang 3.11 $i prioritiseKillingTests
-	#runAnalysis commons-lang 3.12 $i prioritiseKillingTests
-	#date
+	echo "Killing Test Priority Optimized run #$i"
+	date
+	runAnalysis commons-lang 3.10 $i prioritiseKillingTests
+	runAnalysis commons-lang 3.11 $i prioritiseKillingTests
+	runAnalysis commons-lang 3.12 $i prioritiseKillingTests
+	runAnalysis commons-lang 3.12-1 $i prioritiseKillingTests
+	runAnalysis commons-lang 3.12-2 $i prioritiseKillingTests
+	runAnalysis commons-lang 3.12-3 $i prioritiseKillingTests
+	date
 
 	echo "Killing Test Priority Random Optimized run #$i"
 	date
 	runAnalysis commons-lang 3.10 $i prioritiseKillingTestsRandom
 	runAnalysis commons-lang 3.11 $i prioritiseKillingTestsRandom
 	runAnalysis commons-lang 3.12 $i prioritiseKillingTestsRandom
+	runAnalysis commons-lang 3.12-1 $i prioritiseKillingTestsRandom
+	runAnalysis commons-lang 3.12-2 $i prioritiseKillingTestsRandom
+	runAnalysis commons-lang 3.12-3 $i prioritiseKillingTestsRandom
 	date
 
 	echo "Random Test Priority run #$i"
@@ -112,5 +109,8 @@ do
 	runAnalysis commons-lang 3.10 $i randomTestOrder
 	runAnalysis commons-lang 3.11 $i randomTestOrder
 	runAnalysis commons-lang 3.12 $i randomTestOrder
+	runAnalysis commons-lang 3.12-1 $i randomTestOrder
+	runAnalysis commons-lang 3.12-2 $i randomTestOrder
+	runAnalysis commons-lang 3.12-3 $i randomTestOrder
 	date
 done
