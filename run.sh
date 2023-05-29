@@ -17,9 +17,9 @@ function runAnalysis() {
 	if [ "$typ" = "prioritiseKillingTests" ]; then
 		prioritiseTestsStrategy=DEFAULT_WITH_KILLING_FIRST
 	elif [ "$typ" = "prioritiseKillingTestsRandom" ]; then
-	  prioritiseTestsStrategy=RANDOM_WITH_KILLING_FIRST
-  elif [ "$typ" = "randomTestOrder" ]; then
-    prioritiseTestsStrategy=RANDOM
+		prioritiseTestsStrategy=RANDOM_WITH_KILLING_FIRST
+	elif [ "$typ" = "randomTestOrder" ]; then
+		prioritiseTestsStrategy=RANDOM
 	else
 		prioritiseTestsStrategy=DEFAULT
 	fi
